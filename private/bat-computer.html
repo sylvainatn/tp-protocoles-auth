@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Bat-Ordinateur</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 24px;
+      }
+      /* Arsenal affiché en grille (Phase 3.2) */
+      #arsenal {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+      }
+      .card {
+        border: 1px solid #ccc;
+        padding: 12px;
+        width: 200px;
+      }
+      .card h3 {
+        margin: 0 0 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Bat-Ordinateur</h1>
+    <p id="welcome">Authentification…</p>
+    <button id="logout">Déconnexion</button>
+
+    <h2>Arsenal</h2>
+    <div id="arsenal"></div>
+
+    <h2>Nouveau rapport de mission</h2>
+    <form id="report-form">
+      <input type="text" id="report-content" placeholder="Décrivez votre mission…" required />
+      <button type="submit">Envoyer</button>
+    </form>
+    <p id="report-message"></p>
+
+    <script>
+      // L'en-tête Authorization a été construit à la connexion (login.js) et
+      // stocké en sessionStorage. Le navigateur ne le réinjecte pas seul dans
+      // un fetch() : on le relit donc ici pour chaque appel (Phase 3.2).
+      const authHeader = sessionStorage.getItem("auth");
+
+      // Pas connecté -> retour à la page de login
+      if (!authHeader) {
+        window.location.href = "/login.html";
+      }
+
+      // Déconnexion : on oublie les identifiants et on repart au login
+      document.getElementById("logout").onclick = () => {
+        sessionStorage.removeItem("auth");
+        window.location.href = "/login.html";
+      };
+
+      async function init() {
+        // Phase 3.1 : message personnalisé via /api/me
+        const meRes = await fetch("/api/me", {
+          headers: { Authorization: authHeader },
+        });
+        if (!meRes.ok) {
+          sessionStorage.removeItem("auth");
+          window.location.href = "/login.html";
+          return;
+        }
+        const me = await meRes.json();
+        document.getElementById("welcome").textContent =
+          `Bienvenue, Justicier ${me.username}`;
+
+        // Phase 3.2 : arsenal dynamique via /api/secrets
+        const secretsRes = await fetch("/api/secrets", {
+          headers: { Authorization: authHeader },
+        });
+        const gadgets = await secretsRes.json();
+        const arsenal = document.getElementById("arsenal");
+        gadgets.forEach((g) => {
+          arsenal.insertAdjacentHTML(
+            "beforeend",
+            `<div class="card">
+               <h3>${g.name}</h3>
+               <p>${g.desc}</p>
+             </div>`,
+          );
+        });
+      }
+
+      // Phase 3.1 : envoi d'un rapport de mission
+      document.getElementById("report-form").onsubmit = async (e) => {
+        e.preventDefault();
+        const content = document.getElementById("report-content").value;
+        const res = await fetch("/api/reports", {
+          method: "POST",
+          headers: {
+            Authorization: authHeader,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ content }),
+        });
+        const msg = document.getElementById("report-message");
+        if (res.ok) {
+          msg.textContent = "Rapport enregistré !";
+          document.getElementById("report-form").reset();
+        } else {
+          msg.textContent = "Erreur lors de l'envoi du rapport.";
+        }
+      };
+
+      init();
+    </script>
+  </body>
+</html>
