@@ -1,30 +1,47 @@
 <!doctype html>
-<html lang="en">
+<html lang="fr">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Document</title>
+    <title>Inscription — Batcave</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 300px;
+      }
+      input,
+      button {
+        padding: 8px;
+        font-size: 14px;
+      }
+    </style>
   </head>
   <body>
     <form id="register-form">
+      <h1>Inscription à la Batcave</h1>
+
       <label for="username">Nom d'utilisateur</label>
-      <input
-        type="text"
-        id="username"
-        placeholder="Nom d'utilisateur"
-        required
-      />
+      <input type="text" id="username" placeholder="Nom d'utilisateur" required />
+
       <label for="password">Mot de passe</label>
-      <input
-        type="password"
-        id="password"
-        placeholder="Mot de passe"
-        required
-      />
+      <input type="password" id="password" placeholder="Mot de passe" required />
+
       <button type="submit">S'inscrire</button>
+
       <p id="message"></p>
-      <a href="admin-page">Déjà un compte ? 🔒 Administration</a>
+      <p>Déjà un compte ? <a href="/login.html">Se connecter</a></p>
     </form>
+
     <script src="register.js"></script>
   </body>
 </html>
