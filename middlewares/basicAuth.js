@@ -30,7 +30,7 @@ async function basicAuth(req, res, next) {
   const password = decoded.slice(separatorIndex + 1);
 
   const user = db
-    .prepare("SELECT username, password_hash FROM users WHERE username = ?")
+    .prepare("SELECT id, username, password_hash FROM users WHERE username = ?")
     .get(username.trim());
 
   if (!user || !(await bcrypt.compare(password, user.password_hash))) {
@@ -38,7 +38,7 @@ async function basicAuth(req, res, next) {
     return res.status(401).send("Identifiants invalides.");
   }
 
-  req.user = { username: user.username };
+  req.user = { id: user.id, username: user.username };
   next();
 }
 
