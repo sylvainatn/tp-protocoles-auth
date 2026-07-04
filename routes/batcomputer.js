@@ -15,10 +15,10 @@ const gadgets = [
   { name: "Détecteur", desc: "Analyseur de traces médico-légal", icon: "fa-magnifying-glass" },
 ];
 
-// GET /bat-computer -> sert la coquille HTML privée (hors du dossier public).
-// La page est inutile sans identifiants : elle redirige vers /login.html et
-// toutes les données sensibles passent par les APIs protégées ci-dessous.
-router.get("/bat-computer", (req, res) => {
+// GET /bat-computer -> sert la page privée (hors du dossier public), protégée
+// par Basic Auth : le navigateur affiche sa boîte de dialogue native et met
+// les identifiants en cache pour les fetch() suivants (validation Phase 4).
+router.get("/bat-computer", basicAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "private", "bat-computer.html"));
 });
 
