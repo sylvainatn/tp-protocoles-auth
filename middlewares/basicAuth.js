@@ -1,5 +1,5 @@
-const bcrypt = require("bcrypt");
-const db = require("../db");
+import bcrypt from "bcrypt";
+import db from "../db.js";
 
 const WWW_AUTHENTICATE = 'Basic realm="Batcave", charset="UTF-8"';
 
@@ -42,4 +42,4 @@ async function basicAuth(req, res, next) {
   next();
 }
 
-module.exports = basicAuth;
+export default basicAuth;

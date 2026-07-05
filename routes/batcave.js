@@ -1,10 +1,10 @@
-const express = require("express");
-const basicAuth = require("../middlewares/basicAuth");
+import { Router } from "express";
+import basicAuth from "../middlewares/basicAuth.js";
 
-const router = express.Router();
+const router = Router();
 
 router.get("/batcave", basicAuth, (req, res) => {
   res.send(`Bienvenue dans la Batcave, ${req.user.username}.`);
 });
 
-module.exports = router;
+export default router;

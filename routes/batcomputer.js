@@ -1,38 +1,62 @@
-const express = require("express");
-const path = require("path");
-const basicAuth = require("../middlewares/basicAuth");
-const db = require("../db");
+import { Router } from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+import basicAuth from "../middlewares/basicAuth.js";
+import db from "../db.js";
 
-const router = express.Router();
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// L'arsenal de Batman renvoyé par la route sécurisée /api/secrets
+const router = Router();
+
 const gadgets = [
-  { name: "Batarang", desc: "Arme de jet en forme de chauve-souris", icon: "fa-shuriken" },
-  { name: "Grappin", desc: "Pistolet à grappin pour l'escalade", icon: "fa-hand-fist" },
-  { name: "Bat-Signal", desc: "Projecteur d'appel de Gotham", icon: "fa-tower-broadcast" },
-  { name: "Fumigène", desc: "Grenade fumigène pour disparaître", icon: "fa-smog" },
-  { name: "Batmobile", desc: "Véhicule blindé tout-terrain", icon: "fa-car-side" },
-  { name: "Détecteur", desc: "Analyseur de traces médico-légal", icon: "fa-magnifying-glass" },
+  {
+    name: "Batarang",
+    desc: "Arme de jet en forme de chauve-souris",
+    icon: "fa-shuriken",
+  },
+  {
+    name: "Grappin",
+    desc: "Pistolet à grappin pour l'escalade",
+    icon: "fa-hand-fist",
+  },
+  {
+    name: "Bat-Signal",
+    desc: "Projecteur d'appel de Gotham",
+    icon: "fa-tower-broadcast",
+  },
+  {
+    name: "Fumigène",
+    desc: "Grenade fumigène pour disparaître",
+    icon: "fa-smog",
+  },
+  {
+    name: "Batmobile",
+    desc: "Véhicule blindé tout-terrain",
+    icon: "fa-car-side",
+  },
+  {
+    name: "Détecteur",
+    desc: "Analyseur de traces médico-légal",
+    icon: "fa-magnifying-glass",
+  },
 ];
 
-// GET /bat-computer -> sert la page privée (hors du dossier public), protégée
-// par Basic Auth : le navigateur affiche sa boîte de dialogue native et met
-// les identifiants en cache pour les fetch() suivants (validation Phase 4).
 router.get("/bat-computer", basicAuth, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "private", "bat-computer.html"));
 });
 
-// GET /api/secrets -> renvoie l'arsenal au format JSON (Phase 3)
+router.get("/bat-computer.js", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "private", "bat-computer.js"));
+});
+
 router.get("/api/secrets", basicAuth, (req, res) => {
   res.json(gadgets);
 });
 
-// GET /api/me -> infos de l'utilisateur authentifié (Phase 3.1)
 router.get("/api/me", basicAuth, (req, res) => {
   res.json({ id: req.user.id, username: req.user.username });
 });
 
-// POST /api/reports -> enregistre une note de mission liée à l'utilisateur (Phase 3.1)
 router.post("/api/reports", basicAuth, (req, res) => {
   const { content } = req.body;
 
@@ -51,4 +75,4 @@ router.post("/api/reports", basicAuth, (req, res) => {
   });
 });
 
-module.exports = router;
+export default router;

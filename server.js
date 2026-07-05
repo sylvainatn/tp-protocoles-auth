@@ -1,13 +1,12 @@
-const express = require("express");
-const authRoutes = require("./routes/auth");
-const batcaveRoutes = require("./routes/batcave");
-const batComputerRoutes = require("./routes/batcomputer");
+import express from "express";
+import authRoutes from "./routes/auth.js";
+import batcaveRoutes from "./routes/batcave.js";
+import batComputerRoutes from "./routes/batcomputer.js";
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 app.use(express.json());
-
 app.use(express.static("public"));
 
 // Routes
