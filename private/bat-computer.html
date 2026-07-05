@@ -35,80 +35,16 @@
 
     <h2>Nouveau rapport de mission</h2>
     <form id="report-form">
-      <input type="text" id="report-content" placeholder="Décrivez votre mission…" required />
+      <input
+        type="text"
+        id="report-content"
+        placeholder="Décrivez votre mission…"
+        required
+      />
       <button type="submit">Envoyer</button>
     </form>
     <p id="report-message"></p>
 
-    <script>
-      // Deux façons d'arriver ici :
-      //  - via la boîte native du navigateur (identifiants mis en cache par le
-      //    navigateur, réinjectés automatiquement dans les fetch same-origin) ;
-      //  - via la page de login maison (en-tête stocké en sessionStorage).
-      const authHeader = sessionStorage.getItem("auth");
-
-      // Ajoute l'en-tête Authorization seulement si on l'a (login maison).
-      // Sinon on laisse le navigateur joindre ses identifiants mémorisés.
-      function authFetch(url, options = {}) {
-        options.headers = options.headers || {};
-        if (authHeader) options.headers["Authorization"] = authHeader;
-        options.credentials = "same-origin";
-        return fetch(url, options);
-      }
-
-      // Déconnexion : on oublie les identifiants du login maison et on repart
-      // au login (la boîte native reste mémorisée par le navigateur).
-      document.getElementById("logout").onclick = () => {
-        sessionStorage.removeItem("auth");
-        window.location.href = "/login.html";
-      };
-
-      async function init() {
-        // Phase 3.1 : message personnalisé via /api/me
-        const meRes = await authFetch("/api/me");
-        if (!meRes.ok) {
-          sessionStorage.removeItem("auth");
-          window.location.href = "/login.html";
-          return;
-        }
-        const me = await meRes.json();
-        document.getElementById("welcome").textContent =
-          `Bienvenue, Justicier ${me.username}`;
-
-        // Phase 3.2 : arsenal dynamique via /api/secrets
-        const secretsRes = await authFetch("/api/secrets");
-        const gadgets = await secretsRes.json();
-        const arsenal = document.getElementById("arsenal");
-        gadgets.forEach((g) => {
-          arsenal.insertAdjacentHTML(
-            "beforeend",
-            `<div class="card">
-               <h3>${g.name}</h3>
-               <p>${g.desc}</p>
-             </div>`,
-          );
-        });
-      }
-
-      // Phase 3.1 : envoi d'un rapport de mission
-      document.getElementById("report-form").onsubmit = async (e) => {
-        e.preventDefault();
-        const content = document.getElementById("report-content").value;
-        const res = await authFetch("/api/reports", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ content }),
-        });
-        const msg = document.getElementById("report-message");
-        if (res.ok) {
-          msg.textContent = "Rapport enregistré !";
-          document.getElementById("report-form").reset();
-        } else {
-          msg.textContent = "Erreur lors de l'envoi du rapport.";
-        }
-      };
-
-      init();
-    </script>
+    <script src="/bat-computer.js"></script>
   </body>
 </html>
