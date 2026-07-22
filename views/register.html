@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Inscription — Batcave</title>
+  </head>
+  <body>
+    <form action="/auth/register" method="POST">
+      <h1>Inscription à la Batcave</h1>
+
+      <label for="username">Nom d'utilisateur</label>
+      <input
+        type="text"
+        id="username"
+        name="username"
+        placeholder="Nom d'utilisateur"
+        required
+      />
+
+      <label for="password">Mot de passe</label>
+      <input
+        type="password"
+        id="password"
+        name="password"
+        placeholder="Mot de passe"
+        required
+      />
+
+      <button type="submit">S'inscrire</button>
+
+      <p id="message"></p>
+      <p>Déjà un compte ? <a href="/auth/login">Se connecter</a></p>
+    </form>
+  </body>
+</html>
