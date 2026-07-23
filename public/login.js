@@ -32,6 +32,7 @@ loginForm.addEventListener("submit", async (event) => {
   if (res.ok && data && data.requires2FA) {
     currentUsername = data.username;
     loginForm.classList.add("hidden");
+    if (oauthSection) oauthSection.classList.add("hidden");
     twofaForm.classList.remove("hidden");
     message.style.color = "";
     message.textContent =
