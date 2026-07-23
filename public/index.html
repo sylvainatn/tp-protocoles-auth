@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Batcave — Connexion</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        font-family: Arial, sans-serif;
+        background: #111;
+        color: #eee;
+      }
+      h1 {
+        margin: 0 0 8px;
+      }
+      .providers {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 280px;
+      }
+      .btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 12px;
+        border-radius: 6px;
+        text-decoration: none;
+        font-size: 15px;
+        font-weight: bold;
+        color: #fff;
+      }
+      .github {
+        background: #24292f;
+      }
+      .google {
+        background: #4285f4;
+      }
+      .facebook {
+        background: #1877f2;
+      }
+      .sep {
+        color: #888;
+        font-size: 13px;
+      }
+      a.local {
+        color: #9cf;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Accès à la Batcave</h1>
+
+    <div class="providers">
+      <a class="btn github" href="/auth/github">Se connecter avec GitHub</a>
+      <a class="btn google" href="/auth/google">Se connecter avec Google</a>
+      <a class="btn facebook" href="/auth/facebook"
+        >Se connecter avec Facebook</a
+      >
+    </div>
+
+    <p class="sep">— ou —</p>
+    <p>
+      <a class="local" href="/auth/login">Connexion classique (mot de passe)</a>
+    </p>
+  </body>
+</html>
