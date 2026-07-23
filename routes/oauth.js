@@ -6,9 +6,6 @@ import { providers, redirectUriFor } from "../config/oauthProviders.js";
 
 const oauthRoutes = Router();
 
-// Cookies transitoires du flux (state + code_verifier PKCE).
-// sameSite: "lax" est INDISPENSABLE : le retour du fournisseur est une
-// navigation top-level cross-site ; en "strict" le cookie ne serait pas renvoyé.
 const flowCookieOptions = {
   httpOnly: true,
   sameSite: "lax",
@@ -17,7 +14,6 @@ const flowCookieOptions = {
   path: "/",
 };
 
-// GET /auth/:provider — démarre le flux Authorization Code + PKCE.
 oauthRoutes.get("/:provider", (req, res) => {
   const name = req.params.provider;
   const provider = providers[name];
@@ -26,10 +22,11 @@ oauthRoutes.get("/:provider", (req, res) => {
     return res.status(404).send("Fournisseur d'identité inconnu.");
   }
   if (!provider.clientId) {
-    return res.redirect(`/oauth-error.html?error=not_configured&provider=${name}`);
+    return res.redirect(
+      `/oauth-error.html?error=not_configured&provider=${name}`,
+    );
   }
 
-  // Anti-CSRF (state) + PKCE (code_verifier secret / code_challenge public).
   const state = crypto.randomBytes(16).toString("hex");
   const codeVerifier = crypto.randomBytes(32).toString("base64url");
   const codeChallenge = crypto
@@ -53,7 +50,6 @@ oauthRoutes.get("/:provider", (req, res) => {
   return res.redirect(`${provider.authorizeUrl}?${params.toString()}`);
 });
 
-// GET /auth/:provider/callback — retour du fournisseur.
 oauthRoutes.get("/:provider/callback", async (req, res) => {
   const name = req.params.provider;
   const provider = providers[name];
@@ -62,7 +58,6 @@ oauthRoutes.get("/:provider/callback", async (req, res) => {
     return res.status(404).send("Fournisseur d'identité inconnu.");
   }
 
-  // L'utilisateur a cliqué "Annuler" sur la page de consentement.
   if (req.query.error) {
     return res.redirect(
       `/oauth-error.html?error=${encodeURIComponent(req.query.error)}`,
@@ -82,7 +77,6 @@ oauthRoutes.get("/:provider/callback", async (req, res) => {
   res.clearCookie("oauth_verifier");
 
   try {
-    // Échange du code contre un access_token (PKCE : on prouve le code_verifier).
     const body = new URLSearchParams({
       grant_type: "authorization_code",
       code,

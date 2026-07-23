@@ -7,9 +7,6 @@ import {
   signAccessToken,
 } from "./tokens.js";
 
-// Émet une session authentifiée : accessToken (JWT 15 min) + refreshToken
-// (opaque, 7 j, stocké en base), déposés dans deux cookies sécurisés.
-// Utilisé après la 2FA (TP4) et après un login OAuth réussi (TP5).
 export function issueSession(res, user) {
   const accessToken = signAccessToken(user);
 

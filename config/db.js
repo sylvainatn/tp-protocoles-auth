@@ -26,7 +26,6 @@ db.exec(`
   );
 `);
 
-// Migration : ajoute les colonnes manquantes aux bases déjà existantes.
 const userColumns = db
   .prepare("PRAGMA table_info(users)")
   .all()
@@ -46,14 +45,10 @@ for (const [name, type] of Object.entries(columnsToAdd)) {
   }
 }
 
-// Un compte est identifié par le COUPLE (provider, provider_id) :
-// GitHub 12345 ≠ Facebook 12345. Cet index unique rend possible l'upsert
-// ON CONFLICT(provider, provider_id) du login OAuth.
 db.exec(
   "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_provider ON users(provider, provider_id)",
 );
 
-// Les comptes locaux (provider NULL) gardent un username unique.
 db.exec(
   "CREATE UNIQUE INDEX IF NOT EXISTS idx_users_local_username ON users(username) WHERE provider IS NULL",
 );

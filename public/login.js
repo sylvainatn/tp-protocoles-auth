@@ -1,5 +1,6 @@
 const loginForm = document.getElementById("login-form");
 const twofaForm = document.getElementById("twofa-form");
+const oauthSection = document.getElementById("oauth-section");
 const message = document.getElementById("message");
 
 let currentUsername = null;

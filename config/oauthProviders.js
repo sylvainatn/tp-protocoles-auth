@@ -1,14 +1,3 @@
-// Configuration des trois fournisseurs d'identité (OAuth 2.0 / OIDC).
-// Les client_id / client_secret proviennent du .env (à créer sur chaque console).
-//
-// ÉTAPE 2 — Limite constatée de l'IA générative :
-// L'assistant a d'abord affirmé que GitHub renvoie toujours l'email dans
-// GET /user. C'est FAUX : si l'utilisateur a rendu son email privé, le champ
-// `email` est null et il faut un second appel à GET /user/emails (scope
-// user:email) pour récupérer l'email principal vérifié. Corrigé ci-dessous.
-// (Autre confusion classique : mélanger l'endpoint OIDC de Google
-// /v1/userinfo avec l'ancien /oauth2/v3/userinfo, ou OAuth2 vs OIDC.)
-
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 
 export const redirectUriFor = (provider) =>
