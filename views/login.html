@@ -4,11 +4,32 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Connexion — Batcave</title>
+    <style>
+      body {
+        margin: 0;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: Arial, sans-serif;
+      }
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        width: 300px;
+      }
+      input,
+      button {
+        padding: 8px;
+        font-size: 14px;
+      }
+    </style>
   </head>
   <body>
-    <h1>Connexion à la Batcave</h1>
-
     <form action="/auth/login" method="POST">
+      <h1>Connexion à la Batcave</h1>
+
       <label for="username">Nom d'utilisateur</label>
       <input type="text" id="username" name="username" required />
 
@@ -16,8 +37,8 @@
       <input type="password" id="password" name="password" required />
 
       <button type="submit">Se connecter</button>
-    </form>
 
-    <p>Pas encore de compte ? <a href="/auth/register">S'inscrire</a></p>
+      <p>Pas encore de compte ? <a href="/auth/register">S'inscrire</a></p>
+    </form>
   </body>
 </html>
