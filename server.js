@@ -6,6 +6,7 @@ import authRoutes from "./routes/auth.js";
 import apiAuthRoutes from "./routes/apiAuth.js";
 import userRoutes from "./routes/user.js";
 import twoFactorRoutes from "./routes/twoFactor.js";
+import oauthRoutes from "./routes/oauth.js";
 import batcomputerRoutes from "./routes/batcomputer.js";
 import "./config/db.js";
 
@@ -30,6 +31,7 @@ app.use(cookieParser());
 app.use(express.static("public"));
 
 app.use("/auth", authRoutes);
+app.use("/auth", oauthRoutes); // après authRoutes : /auth/login n'est pas capturé par /auth/:provider
 app.use("/api/auth", apiAuthRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api", twoFactorRoutes);
