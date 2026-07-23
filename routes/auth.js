@@ -1,16 +1,9 @@
 import { Router } from "express";
 import path from "path";
 import { fileURLToPath } from "url";
-import crypto from "crypto";
 import bcrypt from "bcrypt";
 import db from "../config/db.js";
 import { isAuthenticated } from "../middlewares/authCheck.js";
-import {
-  REFRESH_TOKEN_MAX_AGE,
-  accessCookieOptions,
-  refreshCookieOptions,
-  signAccessToken,
-} from "../config/tokens.js";
 
 const authRoutes = Router();
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -23,30 +16,32 @@ authRoutes.post("/login", (req, res) => {
   const { username, password } = req.body;
 
   const user = db
-    .prepare("SELECT id, username, password_hash FROM users WHERE username = ?")
+    .prepare(
+      "SELECT id, username, password_hash, two_factor_enabled FROM users WHERE username = ?",
+    )
     .get((username || "").trim());
 
   if (!user || !bcrypt.compareSync(password, user.password_hash)) {
-    return res.status(401).send("Identifiants invalides.");
+    return res.status(401).json({ error: "Identifiants invalides." });
   }
 
-  const accessToken = signAccessToken(user);
+  if (!user.two_factor_enabled) {
+    return res.status(403).json({
+      error:
+        "Vous devez activer la double authentification (2FA) avant de vous connecter.",
+      requiresEnrollment: true,
+    });
+  }
 
-  const refreshToken = crypto.randomBytes(64).toString("hex");
-  const expiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE).toISOString();
-
-  db.prepare(
-    "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
-  ).run(user.id, refreshToken, expiresAt);
-
-  res.cookie("accessToken", accessToken, accessCookieOptions);
-  res.cookie("refreshToken", refreshToken, refreshCookieOptions);
-
-  res.redirect("/bat-computer");
+  return res.json({ requires2FA: true, username: user.username });
 });
 
 authRoutes.get("/change-password", isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "views", "change-password.html"));
+});
+
+authRoutes.get("/setup-2fa", (req, res) => {
+  res.sendFile(path.join(__dirname, "..", "views", "setup-2fa.html"));
 });
 
 authRoutes.get("/register", (req, res) => {
