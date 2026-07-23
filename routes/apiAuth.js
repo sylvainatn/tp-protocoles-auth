@@ -2,6 +2,7 @@ import { Router } from "express";
 import bcrypt from "bcrypt";
 import db from "../config/db.js";
 import { isAuthenticated } from "../middlewares/authCheck.js";
+import { accessCookieOptions, signAccessToken } from "../config/tokens.js";
 
 const apiAuthRoutes = Router();
 
@@ -9,6 +10,44 @@ const apiAuthRoutes = Router();
 // 1 chiffre et 1 caractère spécial. Validation faite EXCLUSIVEMENT côté serveur.
 const STRONG_PASSWORD_REGEX =
   /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{12,}$/;
+
+// ÉTAPE 3 — Rafraîchissement : échange un refreshToken valide (présent en base
+// et non expiré) contre un nouvel accessToken de 15 s.
+apiAuthRoutes.post("/refresh", (req, res) => {
+  const refreshToken = req.cookies?.refreshToken;
+
+  if (!refreshToken) {
+    return res.status(401).json({ error: "Refresh token manquant." });
+  }
+
+  const row = db
+    .prepare(
+      `SELECT rt.id, rt.user_id, rt.expires_at, u.username
+       FROM refresh_tokens rt
+       JOIN users u ON u.id = rt.user_id
+       WHERE rt.token = ?`,
+    )
+    .get(refreshToken);
+
+  // Le refreshToken doit exister en base.
+  if (!row) {
+    return res.status(401).json({ error: "Refresh token invalide." });
+  }
+
+  // ... et ne pas être expiré (vérification serveur, 7 jours).
+  if (new Date(row.expires_at).getTime() < Date.now()) {
+    db.prepare("DELETE FROM refresh_tokens WHERE id = ?").run(row.id);
+    return res.status(401).json({ error: "Refresh token expiré." });
+  }
+
+  // Réémission d'un accessToken pour 15 secondes supplémentaires.
+  const accessToken = signAccessToken({
+    id: row.user_id,
+    username: row.username,
+  });
+  res.cookie("accessToken", accessToken, accessCookieOptions);
+  return res.status(200).json({ message: "Token rafraîchi." });
+});
 
 // Route accessible uniquement à un utilisateur authentifié (accessToken valide).
 apiAuthRoutes.post("/change-password", isAuthenticated, (req, res) => {

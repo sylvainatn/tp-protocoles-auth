@@ -7,6 +7,7 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import authRoutes from "./routes/auth.js";
 import apiAuthRoutes from "./routes/apiAuth.js";
+import userRoutes from "./routes/user.js";
 import batcomputerRoutes from "./routes/batcomputer.js";
 import "./config/db.js";
 
@@ -21,6 +22,7 @@ app.use(express.static("public"));
 
 app.use("/auth", authRoutes);
 app.use("/api/auth", apiAuthRoutes);
+app.use("/api/user", userRoutes);
 app.use(batcomputerRoutes);
 
 app.listen(PORT, () => {
