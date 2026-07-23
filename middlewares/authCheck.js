@@ -2,7 +2,6 @@ import jwt from "jsonwebtoken";
 
 const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET;
 
-// Un appel API attend une réponse JSON (401), pas une redirection HTML.
 function wantsJson(req) {
   return req.originalUrl.startsWith("/api");
 }
@@ -18,12 +17,10 @@ export function isAuthenticated(req, res, next) {
   }
 
   try {
-    // Vérifie la signature ET l'expiration (15 s) du JWT.
     const payload = jwt.verify(accessToken, JWT_ACCESS_SECRET);
     req.user = { id: payload.sub, username: payload.username };
     return next();
   } catch (err) {
-    // Token invalide ou expiré.
     if (wantsJson(req)) {
       return res
         .status(401)

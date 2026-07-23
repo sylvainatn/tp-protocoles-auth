@@ -30,11 +30,8 @@ authRoutes.post("/login", (req, res) => {
     return res.status(401).send("Identifiants invalides.");
   }
 
-  // 1) accessToken : JWT signé avec notre clé secrète, durée de vie 15 s.
   const accessToken = signAccessToken(user);
 
-  // 2) refreshToken : chaîne aléatoire cryptographique (jeton opaque),
-  //    valable 7 jours et stockée en base SQLite.
   const refreshToken = crypto.randomBytes(64).toString("hex");
   const expiresAt = new Date(Date.now() + REFRESH_TOKEN_MAX_AGE).toISOString();
 
@@ -42,14 +39,12 @@ authRoutes.post("/login", (req, res) => {
     "INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (?, ?, ?)",
   ).run(user.id, refreshToken, expiresAt);
 
-  // 3) Envoi des deux jetons dans deux cookies sécurisés distincts.
   res.cookie("accessToken", accessToken, accessCookieOptions);
   res.cookie("refreshToken", refreshToken, refreshCookieOptions);
 
   res.redirect("/bat-computer");
 });
 
-// Page de changement de mot de passe : réservée aux utilisateurs authentifiés.
 authRoutes.get("/change-password", isAuthenticated, (req, res) => {
   res.sendFile(path.join(__dirname, "..", "views", "change-password.html"));
 });
@@ -86,7 +81,6 @@ authRoutes.post("/register", (req, res) => {
 authRoutes.get("/logout", (req, res) => {
   const refreshToken = req.cookies?.refreshToken;
 
-  // On révoque le refreshToken côté serveur (suppression en base).
   if (refreshToken) {
     db.prepare("DELETE FROM refresh_tokens WHERE token = ?").run(refreshToken);
   }
