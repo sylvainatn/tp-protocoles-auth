@@ -28,6 +28,8 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 app.use(cookieParser());
 
+app.get("/", (req, res) => res.redirect("/auth/login"));
+
 app.use(express.static("public"));
 
 app.use("/auth", authRoutes);
